@@ -1,0 +1,35 @@
+name: Deploy to pinata
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '11.10.1'
+      - name: Build 
+        run: |
+          cp .env.prod .env
+          npm install yarn
+          yarn install
+          yarn build
+      - name: deploy to pinata
+        id: pinata
+        uses: aquiladev/ipfs-action@master
+        with:
+          path: ./build
+          service: pinata
+          pinataKey: ${{ secrets.PINATA_KEY }}
+          pinataSecret: ${{ secrets.PINATA_SECRET }}
+      - name: update cloudflare dns
+        uses: textileio/cloudflare-update-dnslink@master
+        env:
+          RECORD_DOMAIN: "taskiner.com"
+          RECORD_NAME: "_dnslink.indexcoop"
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        with:
+          cid: ${{ steps.pinata.outputs.hash }}
+

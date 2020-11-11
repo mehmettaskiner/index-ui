@@ -15,7 +15,7 @@ const Nav: React.FC = () => {
         INDEX
       </StyledLink>
       <StyledLink exact activeClassName='active' to='/vote'>
-        Vote
+        VoteTestTest
       </StyledLink>
       <StyledLink exact activeClassName='active' to='/farm'>
         Farm
